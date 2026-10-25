@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScamTrace India</title>
+  <meta name="description" content="Cyber fraud across Indian states on official data: how many victim complaints become police cases, state by state. Interactive map and assistant.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e2761'/%3E%3Cpath d='M9 17l5 5 9-11' stroke='%23eb6834' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // apply a saved light/dark choice before the page draws, so it doesn't flash
+    try { const t = localStorage.getItem("scamtrace-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+
+<nav class="topnav" aria-label="Main">
+  <a class="brand" href="#top"><span class="logo" aria-hidden="true"></span>ScamTrace India</a>
+  <div class="navlinks">
+    <a href="#map">Map</a>
+    <a href="#findings">Findings</a>
+    <a href="#ask">Ask</a>
+    <a href="#help">Report a scam</a>
+    <a href="#about">About the data</a>
+  </div>
+  <button type="button" class="theme-btn" id="themeBtn" aria-label="Switch light or dark theme">◐</button>
+</nav>
+
+<!-- ================================================================ HERO -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <p class="eyebrow">Official data · 36 states &amp; UTs · NCRB, I4C &amp; RGI</p>
+    <h1>Most cyber fraud complaints never become a police case.</h1>
+    <p class="lead">
+      ScamTrace India puts victims' complaints (I4C) next to the cases police actually
+      register (NCRB), state by state. In 2023, at most <b>7.7 FIRs</b> were registered
+      for every 100 fraud complaints, from <b>0.69 in Delhi</b> to <b>34 in Karnataka</b>.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#map">Explore the map</a>
+      <a class="btn btn-ghost" href="#ask">Ask ScamTrace</a>
+    </div>
+    <section class="tiles" id="tiles" aria-label="Headline numbers"></section>
+    <div class="data-strip" id="dataStrip" role="note" aria-label="Data coverage and last update"></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================================================================ MAP + STATE PANEL -->
+<section class="section" id="map">
+  <div class="section-head">
+    <h2>Explore the map</h2>
+    <p>Pick what to colour India by, then click any state.</p>
+  </div>
+
+  <div class="map-layout">
+    <div class="card map-card">
+      <div class="chip-row" id="mapMetrics" role="group" aria-label="Colour the map by"></div>
+      <div class="map-wrap">
+        <svg id="indiaMap" role="img" aria-label="Map of India coloured by the chosen measure; click a state to open it"></svg>
+        <div class="map-tip" id="mapTip" hidden></div>
+      </div>
+      <div class="map-legend" id="mapLegend"></div>
+      <div class="map-top" id="mapTop"></div>
+      <details><summary>Show as a table</summary>
+        <div class="table-wrap"><table id="mapTable"></table></div></details>
+      <p class="fineprint">Darker = higher. Small UTs (Delhi, Chandigarh, Lakshadweep…) are tiny on the map: use the list or the table. Boundaries indicative only.</p>
+    </div>
+
+    <aside class="card state-panel" id="explore" aria-live="polite">
+      <p class="eyebrow-dark">State profile</p>
+      <h3 id="exTitle">Delhi</h3>
+      <div class="explorer-controls">
+        <label>State <select id="exState"></select></label>
+        <label>Compare with <select id="exCompare"><option value="">(none)</option></select></label>
+      </div>
+      <div id="exCards" class="ex-cards"></div>
+      <div id="exStory" class="ex-story"></div>
+      <p class="card-title">FIRs per lakh people, 2019–2024</p>
+      <div class="chart-box" style="height: 200px"><canvas id="exTrend"
+        aria-label="Line chart of cyber crime FIRs per lakh people for the chosen state"></canvas></div>
+      <button type="button" class="btn btn-soft" id="exAsk">Ask the assistant about Delhi</button>
+    </aside>
+  </div>
+</section>
+
+<!-- ================================================================ FINDINGS -->
+<section class="section" id="findings">
+  <div class="section-head">
+    <h2>What the data shows</h2>
+    <p>Six findings. Each number is published by NCRB, MHA or I4C; joining them on state and year is what this project adds.</p>
+  </div>
+
+  <article class="card finding" id="s1">
+    <div class="finding-head"><span class="num">1</span>
+      <div><h3>Official numbers partly measure police registration, not just crime</h3>
+        <p>Delhi is <b>2nd</b> in India for victim complaints but <b>21st</b> on NCRB's FIR rate. Click a bubble to open that state.</p></div></div>
+    <div class="legend">
+      <span style="--swatch: var(--series-2)">High complaints, few FIRs (weak enforcement)</span>
+      <span style="--swatch: var(--neutral)">Other states/UTs</span>
+    </div>
+    <div class="chart-box" style="height: 460px"><canvas id="quadrantChart"
+      aria-label="Scatter of complaint rate against FIRs per 100 complaints for 36 states and UTs"></canvas></div>
+    <p class="fineprint">Dashed lines are the medians across states. Bubble size = number of complaints. FIRs per 100 complaints is an upper bound.</p>
+    <details><summary>All 36 states: FIRs per 100 complaints</summary>
+      <div class="chart-box" style="height: 760px"><canvas id="conversionChart"
+        aria-label="Bar chart of FIRs per 100 complaints for each state"></canvas></div>
+      <div class="table-wrap"><table id="quadrantTable"></table></div>
+    </details>
+  </article>
+
+  <article class="card finding" id="s2">
+    <div class="finding-head"><span class="num">2</span>
+      <div><h3>The crime rate NCRB publishes, rebuilt and checked</h3>
+        <p>Our all-India rate for 2024 is <b><span id="rate24"></span> per lakh</b>; NCRB publishes 7.3. Telangana and Karnataka top it partly because they register more complaints.</p></div></div>
+    <p class="card-title">FIRs per lakh people, top 20 (<span id="rateYearLabel">2024</span>)</p>
+    <div class="chip-row" id="rateYears" role="group" aria-label="Choose a year"></div>
+    <div class="legend">
+      <span style="--swatch: var(--series-2)">High risk (more than 2× the median, <span id="median24"></span>)</span>
+      <span style="--swatch: var(--series-1)">Other states</span>
+    </div>
+    <div class="chart-box" style="height: 520px"><canvas id="rateChart"
+      aria-label="Bar chart of cyber crime rate per lakh for the top 20 states"></canvas></div>
+    <details><summary>All 36 states, with rank by count vs rank by rate</summary>
+      <div class="table-wrap"><table id="rateTable"></table></div></details>
+  </article>
+
+  <div class="grid-2">
+    <article class="card finding" id="s3">
+      <div class="finding-head"><span class="num">3</span>
+        <div><h3>Almost nothing reaches a conviction</h3>
+          <p>2023, all India. Trials take years, so these are not one group of cases.</p></div></div>
+      <div class="table-wrap"><table id="funnelTable"></table></div>
+      <details><summary>Conviction rate by year</summary>
+        <div class="table-wrap"><table id="convictionTable"></table></div></details>
+    </article>
+
+    <article class="card finding" id="s4">
+      <div class="finding-head"><span class="num">4</span>
+        <div><h3>About 12 paise in every rupee is frozen in time</h3>
+          <p>Money reported lost vs blocked in the fraudster's account, 2023, ₹ crore.</p></div></div>
+      <div class="legend">
+        <span style="--swatch: var(--series-1)">Reported lost</span>
+        <span style="--swatch: var(--series-2)">Frozen in time</span>
+      </div>
+      <div class="chart-box" style="height: 380px"><canvas id="moneyChart"
+        aria-label="Grouped bar chart of money reported lost and frozen for 12 states"></canvas></div>
+      <details><summary>All 36 states</summary>
+        <div class="table-wrap"><table id="moneyTable"></table></div></details>
+    </article>
+
+    <article class="card finding" id="s5">
+      <div class="finding-head"><span class="num">5</span>
+        <div><h3>Registered cyber crime crossed one lakh in 2024</h3>
+          <p>More than doubled in five years. Part of that may be more registration, not only more crime.</p></div></div>
+      <div class="chart-box" style="height: 240px"><canvas id="yearChart"
+        aria-label="Bar chart of cyber crime cases per year 2019 to 2024"></canvas></div>
+      <details><summary>Fastest growing states, and the yearly numbers</summary>
+        <div class="table-wrap"><table id="growthTable"></table></div>
+        <div class="table-wrap"><table id="yearTable"></table></div></details>
+    </article>
+
+    <article class="card finding" id="s6">
+      <div class="finding-head"><span class="num">6</span>
+        <div><h3>Fraud is moving from the card to the phone</h3>
+          <p>Share of cyber fraud cases by type, all India 2023. OTP fraud more than doubled since 2021.</p></div></div>
+      <div class="chart-box" style="height: 240px"><canvas id="typeChart"
+        aria-label="Bar chart of fraud cases by type in 2023"></canvas></div>
+      <details><summary>2021–2023</summary>
+        <div class="table-wrap"><table id="typeTable"></table></div></details>
+    </article>
+  </div>
+</section>
+
+<!-- ================================================================ ASK -->
+<section class="section" id="ask">
+  <div class="card ask-card">
+    <div class="ask-intro">
+      <p class="eyebrow-dark">Assistant</p>
+      <h2>Ask ScamTrace</h2>
+      <p>Type a state or a question in plain English. The assistant looks the answer up in this site's data
+        and says so when it can't. It is rule-based: no AI model, no API, works offline.</p>
+      <div class="chip-row ask-examples">
+        <button type="button" data-ask-inline="Which states have weak enforcement?">Weak enforcement?</button>
+        <button type="button" data-ask-inline="Compare Karnataka and Rajasthan">Karnataka vs Rajasthan</button>
+        <button type="button" data-ask-inline="How much money was lost?">Money lost</button>
+        <button type="button" data-ask-inline="What is an FIR?">What is an FIR?</button>
+        <button type="button" data-ask-inline="When was the data updated?">How recent?</button>
+      </div>
+    </div>
+    <div class="ask-chat">
+      <div class="ask-log" id="askLog" aria-live="polite"></div>
+      <form class="ask-form" id="askForm">
+        <input id="askInput" type="text" autocomplete="off" maxlength="200"
+               placeholder="e.g. tell me about Kerala" aria-label="Your question">
+        <button type="submit" class="btn btn-primary">Ask</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ HELP -->
+<section class="section" id="help">
+  <div class="section-head">
+    <h2>Report a scam</h2>
+    <p>Speed matters: in 2023 only <span id="frozenPct"></span> of the money reported lost was frozen in time.</p>
+  </div>
+  <div class="help-grid">
+    <div class="help-card"><div class="help-num">1930</div><p><b>Call the cyber crime helpline</b><br>
+      Free, national. Call as soon as possible so the bank can try to block the money.</p></div>
+    <div class="help-card"><div class="help-num">cybercrime.gov.in</div><p><b>Report online</b><br>
+      The National Cyber Crime Reporting Portal, if you can't call.</p></div>
+    <div class="help-card"><div class="help-num">Bank + proof</div><p><b>Tell your bank, keep evidence</b><br>
+      Screenshots, transaction IDs, phone numbers, messages.</p></div>
+  </div>
+  <p class="fineprint">General guidance based on the Government's published helpline and portal, not part of the dataset.</p>
+</section>
+
+<!-- ================================================================ ABOUT -->
+<section class="section" id="about">
+  <div class="section-head">
+    <h2>About the data</h2>
+    <p>Everything is official, joined by this project, and checked against the published totals. No machine learning anywhere.</p>
+  </div>
+
+  <div class="pipeline" aria-label="How the data flows">
+    <span>Government PDFs</span><i>→</i><span>Cleaning</span><i>→</i><span>Kafka</span><i>→</i>
+    <span>PostgreSQL</span><i>→</i><span>dbt (22 tests)</span><i>→</i><span>Dashboard + this site</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 id="limitations">Limitations</h3>
+      <ul class="plain">
+        <li><b>Late by design:</b> NCRB publishes 1–2 years after the year ends, so 2024 is the newest.</li>
+        <li><b>Registration, not victimisation:</b> complaints and FIRs show who reports and what police register.</li>
+        <li><b>Convictions lag:</b> trials take years; the yearly funnel mixes old and new cases.</li>
+        <li><b>Yearly only:</b> no monthly data exists; state money figures exist for 2023 only.</li>
+        <li><b>Karnataka</b> files almost no cyber crime under NCRB's "Fraud" head, so fraud-only figures under-count it.</li>
+        <li><b>Population</b> is an official projection (no census since 2011): the only estimate used.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 id="sources">Sources</h3>
+      <ul class="plain">
+        <li>Lok Sabha Q.251, 21 Jul 2026: cyber crime cases by state 2020–2024 (<a href="https://sansad.in/getFile/lsapps/loksabhaquestions/annex/188/AU251_hTDkTd.pdf">PDF</a>)</li>
+        <li>Lok Sabha Q.452, 2 Dec 2025: cases 2019, fraud funnel 2019–2023 (<a href="https://www.mha.gov.in/MHA1/Par2017/pdfs/par2025-pdfs/LS02122025/452.pdf">PDF</a>)</li>
+        <li>Lok Sabha Q.509, 6 Feb 2024: complaints and money by state, 2023 (<a href="https://www.mha.gov.in/MHA1/Par2017/pdfs/par2024-pdfs/LS06022024/509.pdf">PDF</a>)</li>
+        <li>Rajya Sabha Q.1349, 11 Feb 2026: fraud by type 2021–2023 (<a href="https://www.mha.gov.in/MHA1/Par2017/pdfs/par2026-pdfs/RS11022026/1349.pdf">PDF</a>)</li>
+        <li>RGI Population Projections 2011–2036, Table 11 (<a href="https://nhm.gov.in/New_Updates_2018/Report_Population_Projection_2019.pdf">PDF</a>)</li>
+        <li>Map outlines: Apache Superset's India map (Apache 2.0)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p><b>ScamTrace India</b> · Aryan Arora (23BDS0320) · BCSE206L Foundation of Data Science, VIT · Faculty: Sasikala R</p>
+  <p>Official data, no machine learning, no invented numbers.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- no internet? fall back to the local copy of the same library -->
+<script>window.Chart || document.write('<script src="vendor/chart.umd.min.js"><\/script>')</script>
+<script src="data.js"></script>
+<script src="india_map.js"></script>
+<script src="app.js"></script>
+<script src="explore.js"></script>
+<script src="map.js"></script>
+<script src="chat.js"></script>
+<script>
+  // the light/dark button: remembers the choice, and tells the charts to redraw
+  document.getElementById("themeBtn").onclick = () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark"
+                                    : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("scamtrace-theme", root.dataset.theme); } catch (e) {}
+    window.dispatchEvent(new Event("themetoggle"));
+  };
+</script>
+</body>
+</html>
